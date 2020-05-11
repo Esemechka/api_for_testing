@@ -226,9 +226,11 @@ def clients_interests_process(query, store, ctx):
         cir = ClientsInterestsRequest(**query)
         response_dicts = {}
         for i in cir.client_ids:
-            logging.info(f'current interest is {get_interests(store, i)}')
-            response_dicts[i] = get_interests(store, i)
-
+            try:
+                response_dicts[i] = get_interests(store, i)
+            except:
+                response, code = 'Error in connection to store', INTERNAL_ERROR
+                return response, code
             if not response_dicts[i]:
                 response_dicts[i] = f'no data about client {i}'
         logging.info(f'response_dict is {response_dicts}')
@@ -237,7 +239,6 @@ def clients_interests_process(query, store, ctx):
     except Exception as e:
         code = INVALID_REQUEST
         response = str(e)
-
     return response, code
 
 
@@ -263,8 +264,8 @@ def method_handler(request, ctx, store):
 
 
 class MainHTTPHandler(BaseHTTPRequestHandler):
-    def __init__(self):
-        self.store = Store(host=config['host'], port=config['port'])
+
+    store = Store(host=config['host'], port=config['port'])
 
     router = {
         "method": method_handler
