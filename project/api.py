@@ -264,7 +264,6 @@ def method_handler(request, ctx, store):
 
 
 class MainHTTPHandler(BaseHTTPRequestHandler):
-
     store = Store(host=config['host'], port=config['port'])
 
     router = {
